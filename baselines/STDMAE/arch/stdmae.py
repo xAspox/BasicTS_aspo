@@ -3,6 +3,7 @@ from torch import nn
 
 from .mask import Mask
 from .graphwavenet import GraphWaveNet
+from .D2STGNN import D2STGNN
 
 
 class STDMAE(nn.Module):
@@ -23,7 +24,8 @@ class STDMAE(nn.Module):
         self.tmae = Mask(**mask_args)
         self.smae = Mask(**mask_args)
 
-        self.backend = GraphWaveNet(**backend_args)
+        # self.backend = GraphWaveNet(**backend_args)
+        self.backend = D2STGNN(**backend_args)  #TODO gli args si definiscono nel file di configurazione? 
 
         self.short_term_len = short_term_len
 
