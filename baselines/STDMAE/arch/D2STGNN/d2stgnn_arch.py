@@ -7,6 +7,10 @@ from .inherent_block import InhBlock
 from .dynamic_graph_conv.dy_graph_conv import DynamicGraphConstructor
 from .decouple.estimation_gate import EstimationGate
 
+from colorama import Back, init
+init(autoreset=True)
+
+
 
 class DecoupleLayer(nn.Module):
     def __init__(self, hidden_dim, fk_dim=256, first=False, **model_args):
@@ -186,11 +190,19 @@ class D2STGNN(nn.Module):
 
         #NOTE
         # Inserire qui i proiettori di feature e somma per step e std-mae 
+        
         hidden_states_t = self.fc_his_t(hidden_states[:,:,:96])        # B, N, D
-        hidden_states_t = hidden_states_t.transpose(1, 2).unsqueeze(-1)
-        forecast_hidden = forecast_hidden + hidden_states_t
+        # hidden_states_t = hidden_states_t.transpose(1, 2).unsqueeze(-1)
+        
         hidden_states_s = self.fc_his_s(hidden_states[:,:,96:])        # B, N, D
-        hidden_states_s = hidden_states_s.transpose(1, 2).unsqueeze(-1)
+        # hidden_states_s = hidden_states_s.transpose(1, 2).unsqueeze(-1)
+
+        print(Back.GREEN+"\n SHAPES")
+        print(f'hidden_states_t = {hidden_states_t.shape}')
+        print(f'hidden_states_s = {hidden_states_s.shape}')
+        print(f'forecast_hidden = {forecast_hidden.shape}')
+
+        forecast_hidden = forecast_hidden + hidden_states_t
         forecast_hidden = forecast_hidden + hidden_states_s 
 
 
