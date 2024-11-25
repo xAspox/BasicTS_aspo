@@ -199,10 +199,10 @@ class D2STGNN(nn.Module):
         # hidden_states_s = hidden_states_s.transpose(1, 2).unsqueeze(-1)
         hidden_states_s = hidden_states_s.unsqueeze(1)
 
-        print(Back.GREEN+"\n SHAPES")
-        print(f'hidden_states_t = {hidden_states_t.shape}')
-        print(f'hidden_states_s = {hidden_states_s.shape}')
-        print(f'forecast_hidden = {forecast_hidden.shape}')
+        # print(Back.GREEN+"\n SHAPES")
+        # print(f'hidden_states_t = {hidden_states_t.shape}')
+        # print(f'hidden_states_s = {hidden_states_s.shape}')
+        # print(f'forecast_hidden = {forecast_hidden.shape}')
 
         forecast_hidden = forecast_hidden + hidden_states_t
         forecast_hidden = forecast_hidden + hidden_states_s 
