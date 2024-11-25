@@ -141,3 +141,11 @@ class TimeSeriesForecastingDataset(BaseDataset):
             int: The number of valid samples that can be drawn from the dataset, based on the configurations of input and output lengths.
         """
         return len(self.data) - self.input_len - self.output_len + 1
+
+
+#NOTE aggiunto da me 
+
+if __name__ == '__main__': 
+    tfd = TimeSeriesForecastingDataset('METR-LA', [0.7, 0.1, 0.2], 'train', 12, 12)
+    print(f'Data shape = {tfd.data.shape}, type = {type(tfd.data)}')
+    print(f'First datapoint = {tfd.data[0, 137, 0]}')
