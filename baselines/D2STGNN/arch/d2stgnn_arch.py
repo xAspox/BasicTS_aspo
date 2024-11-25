@@ -178,6 +178,9 @@ class D2STGNN(nn.Module):
         tem_forecast_hidden = sum(tem_forecast_hidden_list)
         forecast_hidden = spa_forecast_hidden + tem_forecast_hidden
 
+        #NOTE
+        # Inserire qui i proiettori di feature e somma per step e std-mae 
+
         # regression layer
         forecast = self.out_fc_2(
             F.relu(self.out_fc_1(F.relu(forecast_hidden))))
