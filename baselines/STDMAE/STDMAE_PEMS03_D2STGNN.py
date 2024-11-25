@@ -68,7 +68,7 @@ NUM_EPOCHS = 300
 CFG = EasyDict()
 # General settings
 CFG.DESCRIPTION = 'An Example Config'
-CFG.GPU_NUM = 0 # Number of GPUs to use (0 for CPU mode)
+CFG.GPU_NUM = 2 # Number of GPUs to use (0 for CPU mode)
 # Runner
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 
@@ -102,7 +102,7 @@ CFG.MODEL = EasyDict()
 CFG.MODEL.NAME = MODEL_ARCH.__name__
 CFG.MODEL.ARCH = MODEL_ARCH
 CFG.MODEL.PARAM = MODEL_PARAM
-CFG.MODEL.FORWARD_FEATURES = [0, 1]
+CFG.MODEL.FORWARD_FEATURES = [0, 1, 2]
 CFG.MODEL.TARGET_FEATURES = [0]
 CFG.MODEL.DDP_FIND_UNUSED_PARAMETERS = True
 
