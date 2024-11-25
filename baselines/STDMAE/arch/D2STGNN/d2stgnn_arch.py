@@ -192,10 +192,10 @@ class D2STGNN(nn.Module):
         # Inserire qui i proiettori di feature e somma per step e std-mae 
         
         hidden_states_t = self.fc_his_t(hidden_states[:,:,:96])        # B, N, D
-        hidden_states_t = hidden_states_t.transpose(1, 2).unsqueeze(-1)
+        # hidden_states_t = hidden_states_t.transpose(1, 2).unsqueeze(-1)
         
         hidden_states_s = self.fc_his_s(hidden_states[:,:,96:])        # B, N, D
-        hidden_states_s = hidden_states_s.transpose(1, 2).unsqueeze(-1)
+        # hidden_states_s = hidden_states_s.transpose(1, 2).unsqueeze(-1)
 
         print(Back.GREEN+"\n SHAPES")
         print(f'hidden_states_t = {hidden_states_t.shape}')
