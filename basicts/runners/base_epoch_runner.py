@@ -746,11 +746,6 @@ class BaseEpochRunner(metaclass=ABCMeta):
                 in :attr:`state_dict` match the keys returned by this module's
                 :meth:`~torch.nn.Module.state_dict` function. Default: ``True``
         """
-        print('\n')
-        print(Back.MAGENTA+'resume training happening')
-        print(f'Training dir = {self.ckpt_save_dir}')
-        print(f"model state dict = {checkpoint_dict['model_state_dict']}")
-        print('\n')
 
 
         try:
