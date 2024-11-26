@@ -13,7 +13,7 @@ cmd.sh
 *.csv
 *.pkl
 *.h5
-*.pt
+# *.pt
 *.p
 *.pickle
 *.pyc
