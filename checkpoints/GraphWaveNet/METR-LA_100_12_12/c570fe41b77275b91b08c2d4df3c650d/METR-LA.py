@@ -1,74 +1,55 @@
 import os
 import sys
+import torch
 from easydict import EasyDict
 sys.path.append(os.path.abspath(__file__ + '/../../..'))
 
-import torch
-
 from basicts.metrics import masked_mae, masked_mape, masked_rmse
+from basicts.data import TimeSeriesForecastingDataset
 from basicts.runners import SimpleTimeSeriesForecastingRunner
 from basicts.scaler import ZScoreScaler
-from basicts.data import TimeSeriesForecastingDataset
 from basicts.utils import get_regular_settings, load_adj
 
-from .arch import STDMAE
+from .arch import GraphWaveNet
 
 ############################## Hot Parameters ##############################
 # Dataset & Metrics configuration
-DATA_NAME = 'PEMS03'  # Dataset name
+DATA_NAME = 'METR-LA'  # Dataset name
 regular_settings = get_regular_settings(DATA_NAME)
-# INPUT_LEN = regular_settings['INPUT_LEN']  # Length of input sequence
-INPUT_LEN = 288 * 3
+INPUT_LEN = regular_settings['INPUT_LEN']  # Length of input sequence
 OUTPUT_LEN = regular_settings['OUTPUT_LEN']  # Length of output sequence
 TRAIN_VAL_TEST_RATIO = regular_settings['TRAIN_VAL_TEST_RATIO']  # Train/Validation/Test split ratios
 NORM_EACH_CHANNEL = regular_settings['NORM_EACH_CHANNEL'] # Whether to normalize each channel of the data
 RESCALE = regular_settings['RESCALE'] # Whether to rescale the data
 NULL_VAL = regular_settings['NULL_VAL'] # Null value in the data
 # Model architecture and parameters
-MODEL_ARCH = STDMAE
-adj_mx, _ = load_adj("datasets/" + DATA_NAME + "/adj_mx.pkl", "doubletransition")
+MODEL_ARCH = GraphWaveNet
+adj_mx, _ = load_adj("datasets/" + DATA_NAME +
+                     "/adj_mx.pkl", "doubletransition")
 MODEL_PARAM = {
-    "dataset_name": DATA_NAME,
-    "pre_trained_tmae_path": "baselines/STDMAE/mask_save/TMAE_PEMS03_864.pt",
-    "pre_trained_smae_path": "baselines/STDMAE/mask_save/SMAE_PEMS03_864.pt",
-    "mask_args": {
-                    "patch_size":12,
-                    "in_channel":1,
-                    "embed_dim":96,
-                    "num_heads":4,
-                    "mlp_ratio":4,
-                    "dropout":0.1,
-                    "mask_ratio":0.25,
-                    "encoder_depth":4,
-                    "decoder_depth":1,
-                    "mode":"forecasting"
-    },
-    "backend_args": {
-    "num_feat": 1,
-    "num_hidden": 32,
-    "dropout": 0.1,
-    "seq_length": 12,
-    "k_t": 3,
-    "k_s": 2,
-    "gap": 3,
-    "num_nodes": 358,
-    "adjs": [torch.tensor(adj) for adj in adj_mx],
-    "num_layers": 5,
-    "num_modalities": 2,
-    "node_hidden": 12,
-    "time_emb_dim": 12,
-    "time_in_day_size": 288,
-    "day_in_week_size": 7,
-    },
-    "short_term_len": OUTPUT_LEN
+    "num_nodes": 207,
+    "supports": [torch.tensor(i) for i in adj_mx],
+    "dropout": 0.3,
+    "gcn_bool": True,
+    "addaptadj": True,
+    "aptinit": None,
+    "in_dim": 2,
+    "out_dim": 12,
+    "residual_channels": 32,
+    "dilation_channels": 32,
+    "skip_channels": 256,
+    "end_channels": 512,
+    "kernel_size": 2,
+    "blocks": 4,
+    "layers": 2
 }
-NUM_EPOCHS = 300
+NUM_EPOCHS = 100
 
 ############################## General Configuration ##############################
 CFG = EasyDict()
 # General settings
 CFG.DESCRIPTION = 'An Example Config'
-CFG.GPU_NUM = 0 # Number of GPUs to use (0 for CPU mode)
+CFG.GPU_NUM = 1 # Number of GPUs to use (0 for CPU mode)
 # Runner
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 
@@ -104,7 +85,6 @@ CFG.MODEL.ARCH = MODEL_ARCH
 CFG.MODEL.PARAM = MODEL_PARAM
 CFG.MODEL.FORWARD_FEATURES = [0, 1]
 CFG.MODEL.TARGET_FEATURES = [0]
-CFG.MODEL.DDP_FIND_UNUSED_PARAMETERS = True
 
 ############################## Metrics Configuration ##############################
 
@@ -123,7 +103,7 @@ CFG.TRAIN = EasyDict()
 CFG.TRAIN.NUM_EPOCHS = NUM_EPOCHS
 CFG.TRAIN.CKPT_SAVE_DIR = os.path.join(
     'checkpoints',
-    CFG.MODEL.NAME,
+    MODEL_ARCH.__name__,
     '_'.join([DATA_NAME, str(CFG.TRAIN.NUM_EPOCHS), str(INPUT_LEN), str(OUTPUT_LEN)])
 )
 CFG.TRAIN.LOSS = masked_mae
@@ -131,52 +111,41 @@ CFG.TRAIN.LOSS = masked_mae
 CFG.TRAIN.OPTIM = EasyDict()
 CFG.TRAIN.OPTIM.TYPE = "Adam"
 CFG.TRAIN.OPTIM.PARAM = {
-    "lr":0.002,
-    "weight_decay":1.0e-5,
-    "eps":1.0e-8,
+    "lr": 0.002,
+    "weight_decay": 0.0001,
 }
 # Learning rate scheduler settings
 CFG.TRAIN.LR_SCHEDULER = EasyDict()
 CFG.TRAIN.LR_SCHEDULER.TYPE = "MultiStepLR"
 CFG.TRAIN.LR_SCHEDULER.PARAM = {
-    "milestones":[1, 18, 36, 54, 72],
-    "gamma":0.5
+    "milestones": [1, 50],
+    "gamma": 0.5
 }
 # Train data loader settings
 CFG.TRAIN.DATA = EasyDict()
-CFG.TRAIN.DATA.BATCH_SIZE = 8
+CFG.TRAIN.DATA.BATCH_SIZE = 16
 CFG.TRAIN.DATA.SHUFFLE = True
-CFG.TRAIN.DATA.NUM_WORKERS = 2
-CFG.TRAIN.DATA.PIN_MEMORY = True
+# Gradient clipping settings
 CFG.TRAIN.CLIP_GRAD_PARAM = {
-    "max_norm": 3.0
+    "max_norm": 5.0
 }
-# curriculum learning
-CFG.TRAIN.CL = EasyDict()
-CFG.TRAIN.CL.WARM_EPOCHS = 0
-CFG.TRAIN.CL.CL_EPOCHS = 6
-CFG.TRAIN.CL.PREDICTION_LENGTH = 12
 
 ############################## Validation Configuration ##############################
 CFG.VAL = EasyDict()
 CFG.VAL.INTERVAL = 1
 CFG.VAL.DATA = EasyDict()
-CFG.VAL.DATA.BATCH_SIZE = 8
-CFG.VAL.DATA.NUM_WORKERS = 2
-CFG.VAL.DATA.PIN_MEMORY = True
+CFG.VAL.DATA.BATCH_SIZE = 64
 
 ############################## Test Configuration ##############################
 CFG.TEST = EasyDict()
 CFG.TEST.INTERVAL = 1
 CFG.TEST.DATA = EasyDict()
-CFG.TEST.DATA.BATCH_SIZE = 8
-CFG.TEST.DATA.NUM_WORKERS = 2
-CFG.TEST.DATA.PIN_MEMORY = True
+CFG.TEST.DATA.BATCH_SIZE = 64
 
 ############################## Evaluation Configuration ##############################
 
 CFG.EVAL = EasyDict()
 
 # Evaluation parameters
-CFG.EVAL.HORIZONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] # Prediction horizons for evaluation. Default: []
+CFG.EVAL.HORIZONS = [3, 6, 12] # Prediction horizons for evaluation. Default: []
 CFG.EVAL.USE_GPU = True # Whether to use GPU for evaluation. Default: True
