@@ -24,6 +24,8 @@ from easytorch.device import to_device
 from . import optim
 from ..utils import get_dataset_name
 
+import shutil
+
 class BaseEpochRunner(metaclass=ABCMeta):
     """
     A base runner that uses epoch as the fundamental training unit.
@@ -636,6 +638,10 @@ class BaseEpochRunner(metaclass=ABCMeta):
         self.save_model(epoch)
         # reset epoch meters
         self.reset_epoch_meters()
+
+        #NOTE aspo - aggiunto: 
+        if epoch % 3 == 0:
+            shutil.make_archive(f'/kaggle/working/stdmae_d2stgnn_ckp_ep{epoch}', 'zip', '/kaggle/working/BasicTS/checkpoints')
 
     @master_only
     def on_validating_start(self, train_epoch: Optional[int]):
