@@ -25,6 +25,7 @@ from . import optim
 from ..utils import get_dataset_name
 
 import shutil
+import os
 from colorama import Back, init
 init(autoreset=True)
 
@@ -642,8 +643,14 @@ class BaseEpochRunner(metaclass=ABCMeta):
         self.reset_epoch_meters()
 
         #NOTE aspo - aggiunto: 
-        if epoch % 3 == 0:
-            shutil.make_archive(f'/kaggle/working/stdmae_d2stgnn_ckp_ep{epoch}', 'zip', '/kaggle/working/BasicTS_aspo/checkpoints')
+        shutil.make_archive(f'/kaggle/working/stdmae_d2stgnn_ckp_ep{epoch}', 'zip', '/kaggle/working/BasicTS_aspo/checkpoints')
+        file_path = f"/kaggle/working/stdmae_d2stgnn_ckp_ep{epoch-2}"
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print(f"{file_path} has been deleted.")
+        else:
+            print(f"The file {file_path} does not exist.")
+
 
     @master_only
     def on_validating_start(self, train_epoch: Optional[int]):
