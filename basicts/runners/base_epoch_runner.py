@@ -643,7 +643,7 @@ class BaseEpochRunner(metaclass=ABCMeta):
 
         #NOTE aspo - aggiunto: 
         if epoch % 3 == 0:
-            shutil.make_archive(f'/kaggle/working/stdmae_d2stgnn_ckp_ep{epoch}', 'zip', '/kaggle/working/BasicTS/checkpoints')
+            shutil.make_archive(f'/kaggle/working/stdmae_d2stgnn_ckp_ep{epoch}', 'zip', '/kaggle/working/BasicTS_aspo/checkpoints')
 
     @master_only
     def on_validating_start(self, train_epoch: Optional[int]):
