@@ -635,7 +635,7 @@ class BaseEpochRunner(metaclass=ABCMeta):
         if self.val_data_loader is not None and epoch % self.val_interval == 0:
             self.validate(train_epoch=epoch)
         # perform testing if configured
-        if self.test_data_loader is not None and epoch % self.test_interval == 0:
+        if self.test_data_loader is not None and epoch % 5 == 0:    # self.test_interval == 0:
             self.test_pipeline(train_epoch=epoch)
         # save the model checkpoint
         self.save_model(epoch)
