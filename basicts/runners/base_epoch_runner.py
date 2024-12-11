@@ -643,13 +643,13 @@ class BaseEpochRunner(metaclass=ABCMeta):
         self.reset_epoch_meters()
 
         #NOTE aspo - aggiunto: 
-        shutil.make_archive(f'/kaggle/working/stdmae_d2stgnn_ckp_ep{epoch}', 'zip', '/kaggle/working/BasicTS_aspo/checkpoints')
-        file_path = f"/kaggle/working/stdmae_d2stgnn_ckp_ep{epoch-2}.zip"
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            print(f"{file_path} has been deleted.")
-        else:
-            print(f"The file {file_path} does not exist.")
+        # shutil.make_archive(f'/kaggle/working/stdmae_d2stgnn_ckp_ep{epoch}', 'zip', '/kaggle/working/BasicTS_aspo/checkpoints')
+        # file_path = f"/kaggle/working/stdmae_d2stgnn_ckp_ep{epoch-2}.zip"
+        # if os.path.exists(file_path):
+            # os.remove(file_path)
+            # print(f"{file_path} has been deleted.")
+        # else:
+            # print(f"The file {file_path} does not exist.")
 
 
     @master_only
