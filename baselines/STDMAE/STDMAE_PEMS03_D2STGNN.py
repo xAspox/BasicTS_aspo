@@ -127,7 +127,7 @@ CFG.TRAIN.CKPT_SAVE_DIR = os.path.join(
     '_'.join([DATA_NAME, str(CFG.TRAIN.NUM_EPOCHS), str(INPUT_LEN), str(OUTPUT_LEN)])
 )
 CFG.TRAIN.LOSS = masked_mae
-CFG.TRAIN.FINETUNE_FROM = "/kaggle/input/ckpt/pytorch/default/1/STDMAE_026.pt"
+# CFG.TRAIN.FINETUNE_FROM = "/kaggle/input/ckpt/pytorch/default/1/STDMAE_026.pt"
 # Optimizer settings
 CFG.TRAIN.OPTIM = EasyDict()
 CFG.TRAIN.OPTIM.TYPE = "Adam"
@@ -168,9 +168,9 @@ CFG.VAL.DATA.PIN_MEMORY = True
 
 ############################## Test Configuration ##############################
 CFG.TEST = EasyDict()
-CFG.TEST.INTERVAL = 5
+CFG.TEST.INTERVAL = 301
 CFG.TEST.DATA = EasyDict()
-CFG.TEST.DATA.BATCH_SIZE = 8
+CFG.TEST.DATA.BATCH_SIZE = 4
 CFG.TEST.DATA.NUM_WORKERS = 2
 CFG.TEST.DATA.PIN_MEMORY = True
 
