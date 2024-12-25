@@ -11,7 +11,7 @@ from basicts.scaler import ZScoreScaler
 from basicts.data import TimeSeriesForecastingDataset
 from basicts.utils import get_regular_settings, load_adj
 
-from .arch import STDMAE
+from .arch import STDMAE_gwn
 
 ############################## Hot Parameters ##############################
 # Dataset & Metrics configuration
@@ -25,7 +25,7 @@ NORM_EACH_CHANNEL = regular_settings['NORM_EACH_CHANNEL'] # Whether to normalize
 RESCALE = regular_settings['RESCALE'] # Whether to rescale the data
 NULL_VAL = regular_settings['NULL_VAL'] # Null value in the data
 # Model architecture and parameters
-MODEL_ARCH = STDMAE
+MODEL_ARCH = STDMAE_gwn
 adj_mx, _ = load_adj("datasets/" + DATA_NAME + "/adj_mx.pkl", "doubletransition")
 MODEL_PARAM = {
     "dataset_name": DATA_NAME,
@@ -68,7 +68,7 @@ NUM_EPOCHS = 300
 CFG = EasyDict()
 # General settings
 CFG.DESCRIPTION = 'An Example Config'
-CFG.GPU_NUM = 2 # Number of GPUs to use (0 for CPU mode)
+CFG.GPU_NUM = 1   # Number of GPUs to use (0 for CPU mode)
 # Runner
 CFG.RUNNER = SimpleTimeSeriesForecastingRunner
 
@@ -167,7 +167,7 @@ CFG.VAL.DATA.PIN_MEMORY = True
 
 ############################## Test Configuration ##############################
 CFG.TEST = EasyDict()
-CFG.TEST.INTERVAL = 1
+CFG.TEST.INTERVAL = 302
 CFG.TEST.DATA = EasyDict()
 CFG.TEST.DATA.BATCH_SIZE = 8
 CFG.TEST.DATA.NUM_WORKERS = 2
