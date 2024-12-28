@@ -849,7 +849,7 @@ class BaseEpochRunner(metaclass=ABCMeta):
             }
             ckpt_path = os.path.join(
                 self.ckpt_save_dir,
-                '{}_best_{}.pt'.format(self.model_name, metric_name.replace('/', '_'))
+                '{}_best_{}_ep{}.pt'.format(self.model_name, metric_name.replace('/', '_'), epoch)
             )
             save_ckpt(ckpt_dict, ckpt_path, self.logger)
             self.current_patience = self.early_stopping_patience # reset patience
