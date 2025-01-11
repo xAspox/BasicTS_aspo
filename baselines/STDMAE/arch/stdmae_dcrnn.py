@@ -2,10 +2,10 @@ import torch
 from torch import nn
 
 from .mask import Mask
-from .graphwavenet import GraphWaveNet
+from .DCRNN import DCRNN
 
 
-class STDMAE_gwn(nn.Module):
+class STDMAE_DCRNN(nn.Module):
     """
     Paper: Spatio-Temporal-Decoupled Masked Pre-training for Traffic Forecasting
     Link: https://arxiv.org/abs/2312.00516
@@ -17,7 +17,6 @@ class STDMAE_gwn(nn.Module):
     def __init__(self, dataset_name, pre_trained_tmae_path,pre_trained_smae_path, mask_args, backend_args, short_term_len):
         super().__init__()
         torch.set_default_tensor_type(torch.cuda.FloatTensor)  #NOTE aggiunto da me per far creare ogni tensore su cuda
-
         self.dataset_name = dataset_name
         self.pre_trained_tmae_path = pre_trained_tmae_path
         self.pre_trained_smae_path = pre_trained_smae_path
@@ -25,7 +24,8 @@ class STDMAE_gwn(nn.Module):
         self.tmae = Mask(**mask_args)
         self.smae = Mask(**mask_args)
 
-        self.backend = GraphWaveNet(**backend_args)
+        # self.backend = GraphWaveNet(**backend_args)
+        self.backend = DCRNN(**backend_args)  #TODO gli args si definiscono nel file di configurazione? 
 
         self.short_term_len = short_term_len
 
@@ -66,9 +66,6 @@ class STDMAE_gwn(nn.Module):
 
         batch_size, _, num_nodes, _ = history_data.shape
 
-        # print(f"\n\n\nDevice of long_history_data: {long_history_data.device}")
-        # print(f"Device of self.inv_freq: {self.inv_freq.device}\n\n\n")
-
         hidden_states_t = self.tmae(long_history_data[..., [0]])
         hidden_states_s = self.smae(long_history_data[..., [0]])
         hidden_states=torch.cat((hidden_states_t,hidden_states_s),-1)
@@ -79,3 +76,4 @@ class STDMAE_gwn(nn.Module):
         y_hat = self.backend(short_term_history, hidden_states=hidden_states).transpose(1, 2).unsqueeze(-1)
 
         return y_hat
+
